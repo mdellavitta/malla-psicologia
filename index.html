@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Malla Curricular - Psicología UADER</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f7f9fc;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    .column {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    .column h2 {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #4a6fa5;
+      margin-bottom: 1rem;
+    }
+    .materia {
+      background-color: #e2ecf6;
+      padding: 0.6rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      position: relative;
+    }
+    .materia:hover {
+      background-color: #d0e2f0;
+    }
+    .materia.aprobada {
+      background-color: #b1e5c4;
+      text-decoration: line-through;
+    }
+    .materia.bloqueada {
+      background-color: #ddd;
+      color: #777;
+      cursor: not-allowed;
+    }
+    .materia .tooltip {
+      visibility: hidden;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 0.4rem;
+      position: absolute;
+      z-index: 1;
+      bottom: 105%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.75rem;
+      width: 200px;
+    }
+    .materia:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <h1>Malla Curricular - Psicología (UADER)</h1>
+  <div class="grid" id="malla"></div>
+
+  <script>
+    const materias = [
+      // === PRIMER AÑO ===
+      { id: "epistemologia", nombre: "Epistemología", anio: 1, requisitos: [] },
+      { id: "teoriaEstado", nombre: "Teoría Social y del Estado", anio: 1, requisitos: [] },
+      { id: "semiotica", nombre: "Semiótica", anio: 1, requisitos: [] },
+      { id: "filosofia", nombre: "Introducción a la Filosofía", anio: 1, requisitos: [] },
+      { id: "desarrollo1", nombre: "Psicología del Desarrollo I", anio: 1, requisitos: [] },
+      { id: "corrientes1", nombre: "Corrientes de la Psicología Contemporánea I", anio: 1, requisitos: [] },
+      { id: "problepi", nombre: "Problemática Epistemológica de la Psicología", anio: 1, requisitos: [] },
+      { id: "biologia", nombre: "Biología", anio: 1, requisitos: [] },
+
+      // === SEGUNDO AÑO ===
+      { id: "psicolinguistica", nombre: "Psicolingüística", anio: 2, requisitos: ["semiotica"] },
+      { id: "antropologia", nombre: "Antropología", anio: 2, requisitos: ["filosofia"] },
+      { id: "mitologia", nombre: "Historia de las Culturas y Mitologías", anio: 2, requisitos: ["antropologia"] },
+      { id: "desarrollo2", nombre: "Psicología del Desarrollo II", anio: 2, requisitos: ["desarrollo1"] },
+      { id: "corrientes2", nombre: "Corrientes de la Psicología Contemporánea II", anio: 2, requisitos: ["corrientes1"] },
+      { id: "teopsico", nombre: "Teoría Psicoanalítica", anio: 2, requisitos: ["problepi"] },
+      { id: "neurobio", nombre: "Neurobiología", anio: 2, requisitos: ["biologia"] },
+
+      // === TERCER AÑO ===
+      { id: "metodo", nombre: "Metodología de la Investigación", anio: 3, requisitos: ["epistemologia", "problepi", "corrientes2"] },
+      { id: "desarrollo3", nombre: "Psicología del Desarrollo III", anio: 3, requisitos: ["desarrollo2"] },
+      { id: "escuelaIng", nombre: "Teoría Psicoanalítica: Escuela Inglesa", anio: 3, requisitos: ["teopsico"] },
+      { id: "escuelaFr", nombre: "Teoría Psicoanalítica: Escuela Francesa", anio: 3, requisitos: ["teopsico"] },
+      { id: "social", nombre: "Psicología Social", anio: 3, requisitos: ["corrientes2"] },
+      { id: "instrumentos", nombre: "Instrumentos de Diagnóstico", anio: 3, requisitos: ["corrientes2"] },
+      { id: "salud", nombre: "Salud Pública y Mental", anio: 3, requisitos: ["teoriaEstado", "corrientes2"] },
+
+      // === CUARTO AÑO ===
+      { id: "vocacional", nombre: "Orientación Vocacional y Laboral", anio: 4, requisitos: ["instrumentos"] },
+      { id: "institucional", nombre: "Psicología Institucional", anio: 4, requisitos: ["escuelaIng", "escuelaFr"] },
+      { id: "etica", nombre: "Psicología, Ética y Derechos Humanos", anio: 4, requisitos: ["filosofia", "corrientes2"] },
+      { id: "educacional", nombre: "Psicología Educacional", anio: 4, requisitos: ["psicolinguistica", "desarrollo2", "corrientes2"] },
+      { id: "psicopato1", nombre: "Psicopatología I", anio: 4, requisitos: ["escuelaIng", "escuelaFr"] },
+      { id: "clinica1", nombre: "Clínica I", anio: 4, requisitos: ["escuelaIng", "escuelaFr"] },
+      { id: "comunitaria", nombre: "Psicología Socio-Comunitaria", anio: 4, requisitos: ["corrientes2", "social", "salud"] },
+      { id: "psicopato2", nombre: "Psicopatología II", anio: 4, requisitos: ["corrientes2", "instrumentos"] },
+      { id: "clinica2", nombre: "Clínica II", anio: 4, requisitos: ["corrientes2", "instrumentos"] },
+      { id: "juridica", nombre: "Psicología Jurídica Forense", anio: 4, requisitos: ["corrientes2", "salud"] },
+
+      // === QUINTO AÑO ===
+      { id: "psiquiatria", nombre: "Psiquiatría y Psicofarmacología", anio: 5, requisitos: ["neurobio", "psicopato1", "psicopato2"] },
+      { id: "comunicacion", nombre: "Comunicación y Relaciones Humanas", anio: 5, requisitos: ["psicolinguistica", "social", "institucional"] },
+      { id: "tesis1", nombre: "Seminario de Tesis I", anio: 5, requisitos: ["metodo", "salud", "institucional", "educacional", "clinica1", "clinica2", "comunitaria"] },
+      { id: "tesis2", nombre: "Seminario de Tesis II", anio: 5, requisitos: ["tesis1"] },
+      { id: "practicas", nombre: "Prácticas Supervisadas", anio: 5, requisitos: ["social", "institucional", "comunitaria"] },
+
+      // === COMPLEMENTARIOS ===
+      { id: "portugues1", nombre: "Lengua Extranjera I: Portugués", anio: 5, requisitos: [] },
+      { id: "portugues2", nombre: "Lengua Extranjera II: Portugués", anio: 5, requisitos: ["portugues1"] },
+      { id: "info1", nombre: "Informática I", anio: 5, requisitos: [] },
+      { id: "info2", nombre: "Informática II", anio: 5, requisitos: ["info1"] },
+      { id: "sistémica", nombre: "Clínica Sistémica (electivo)", anio: 5, requisitos: ["clinica2"] },
+      { id: "tif", nombre: "Trabajo Integrador Final", anio: 5, requisitos: materias.map(m => m.id).filter(id => id !== "tif") }
+    ];
+
+    const aprobadas = new Set(JSON.parse(localStorage.getItem("materias_aprobadas") || "[]"));
+
+    const grid = document.getElementById("malla");
+    for (let anio = 1; anio <= 5; anio++) {
+      const col = document.createElement("div");
+      col.className = "column";
+      col.innerHTML = `<h2>Año ${anio}</h2>`;
+      materias.filter(m => m.anio === anio).forEach(m => {
+        const div = document.createElement("div");
+        div.className = "materia";
+        div.id = m.id;
+        const requisitosFaltantes = m.requisitos.filter(r => !aprobadas.has(r));
+        if (requisitosFaltantes.length > 0) {
+          div.classList.add("bloqueada");
+          const tooltip = document.createElement("div");
+          tooltip.className = "tooltip";
+          tooltip.innerText = "Falta: " + requisitosFaltantes.map(rid => {
+            const req = materias.find(mat => mat.id === rid);
+            return req ? req.nombre : rid;
+          }).join(", ");
+          div.appendChild(tooltip);
+        } else {
+          div.addEventListener("click", () => toggleAprobada(m.id));
+        }
+        if (aprobadas.has(m.id)) div.classList.add("aprobada");
+        div.innerText = m.nombre;
+        col.appendChild(div);
+      });
+      grid.appendChild(col);
+    }
+
+    function toggleAprobada(id) {
+      if (aprobadas.has(id)) aprobadas.delete(id);
+      else aprobadas.add(id);
+      localStorage.setItem("materias_aprobadas", JSON.stringify([...aprobadas]));
+      location.reload();
+    }
+  </script>
+</body>
+</html>
